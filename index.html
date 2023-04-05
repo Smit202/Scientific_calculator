@@ -16,8 +16,8 @@
         </div>
         <div class="calculator">
             <div class="display">
-                <div class="input"><input type="text" id="expression"></div>
-                <div class="output">258</div>
+                <div class="output"><input type="text" id="expression" disabled></div>
+                <div class="input"><input type="text" id="number"></div>
             </div>
 
             <div class="format">
@@ -56,17 +56,17 @@
 
                 <div class="operations-item" id="square">x<sup>2</sup></div>
                 <div class="operations-item" id="inverse"><sup>1</sup>/<sub>x</sub></div>
-                <div class="operations-item" id="mod">|x|</div>
+                <div class="operations-item" id="absolute">|x|</div>
                 <div class="operations-item" id="exponential">exp</div>
-                <div class="operations-item" id="%">mod</div>
+                <div class="operations-item" id="mod">mod</div>
 
                 <div class="operations-item" id="squareRoot">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="20" enable-background="new 0 0 128 128" viewBox="0 0 128 128"><path d="m40.091 125.046-29.423-44.505h-10.668v-10.189h16.158l17.095 25.86 11.128-93.35h83.619v10.189h-74.559zm35.145-19.218c6.353-.122 6.713-3.953 6.713-3.953 1.679-5.865 4.916-12.328 8.872-18.435 4.915 8.98 10.19 17.119 14.744 17.119 5.155 0 11.15-7.181 11.15-9.577-.12-3.47-4.915-.958-8.991-4.908-3.596-3.472-6.594-8.261-9.35-13.169 5.633-7.181 11.268-13.047 14.145-15.8.48-.48 2.517-1.915 2.517-3.234 0-1.796-2.758-2.512-5.154-2.512-2.039 0-3.836.239-6.954 2.873-2.877 2.393-6.114 5.627-9.471 9.335-3.357-6.462-6.114-11.492-8.631-11.492-5.633 0-10.429 3.953-10.429 5.627 0 2.276 1.918 2.276 3.836 4.072 1.918 2.035 4.435 6.343 7.192 11.492-9.47 12.089-17.622 25.019-17.622 28.489.001 1.558 1.679 4.073 7.433 4.073z" fill="#000"/></svg>
                 </div>
-                <div class="operations-item" id="(">(</div>
-                <div class="operations-item" id=")">)</div>
+                <div class="operations-item" id="leftParenthesis">(</div>
+                <div class="operations-item" id="rightParenthesis">)</div>
                 <div class="operations-item" id="factorial">n!</div>
-                <div class="operations-item" id="/">
+                <div class="operations-item" id="division">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="20" enable-background="new 0 0 128 128" viewBox="0 0 128 128"><path d="m125.61 71.81h-123.22c-1.32 0-2.39-1.07-2.39-2.39v-9.787c0-1.32 1.07-2.39 2.39-2.39h123.22c1.32 0 2.39 1.07 2.39 2.39v9.787c0 1.32-1.07 2.39-2.39 2.39zm-61.61-40.573c4.627 0 8.378-3.746 8.378-8.366s-3.751-8.367-8.378-8.367-8.378 3.746-8.378 8.366 3.751 8.367 8.378 8.367zm0 82.168c4.627 0 8.378-3.746 8.378-8.366s-3.751-8.367-8.378-8.367-8.378 3.746-8.378 8.366 3.751 8.367 8.378 8.367z" fill="#000"/></svg>
                 </div>
 
@@ -74,7 +74,7 @@
                 <div class="operations-item-number" id="7">7</div>
                 <div class="operations-item-number" id="8">8</div>
                 <div class="operations-item-number" id="9">9</div>
-                <div class="operations-item" id="*">
+                <div class="operations-item" id="multiplication">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="20" enable-background="new 0 0 24 24" viewBox="0 0 24 24"><path d="m13.4 12 6.3-6.3c.4-.4.4-1 0-1.4s-1-.4-1.4 0l-6.3 6.3-6.3-6.3c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l6.3 6.3-6.3 6.3c-.2.2-.3.4-.3.7 0 .6.4 1 1 1 .3 0 .5-.1.7-.3l6.3-6.3 6.3 6.3c.2.2.4.3.7.3s.5-.1.7-.3c.4-.4.4-1 0-1.4z"/></svg>
                 </div>
 
@@ -82,7 +82,7 @@
                 <div class="operations-item-number" id="4">4</div>
                 <div class="operations-item-number" id="5">5</div>
                 <div class="operations-item-number" id="6">6</div>
-                <div class="operations-item" id="-">
+                <div class="operations-item" id="subtraction">
                     <svg xmlns="http://www.w3.org/2000/svg" width="50" height="20" id="i-minus" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                         <path d="M2 16 L30 16"/>
                     </svg>
@@ -92,7 +92,7 @@
                 <div class="operations-item-number" id="1">1</div>
                 <div class="operations-item-number" id="2">2</div>
                 <div class="operations-item-number" id="3">3</div>
-                <div class="operations-item" id="+">
+                <div class="operations-item" id="addition">
                     <svg xmlns="http://www.w3.org/2000/svg" width="50" height="22" viewBox="0 0 512 512">
                         <polygon fill="var(--ci-primary-color, currentColor)" points="440 240 272 240 272 72 240 72 240 240 72 240 72 272 240 272 240 440 272 440 272 272 440 272 440 240" class="ci-primary"/>
                     </svg>

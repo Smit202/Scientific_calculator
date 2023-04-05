@@ -38,7 +38,7 @@ sub {
     /* background-color: aliceblue; */
     padding: 12px;
     /* padding-bottom: 40px; */
-    border-bottom: 2px solid rgba(128, 128, 128, 0.6);
+    border-bottom: 2px solid rgba(128, 128, 128, 0.5);
 }
 
 .heading h2 {
@@ -63,6 +63,7 @@ sub {
 .display {
     width: 100%;
     height: 22%;
+    padding: 5% 0%;
     /* background-color: red; */
 }
 
@@ -71,31 +72,42 @@ sub {
     height: 60%;
 }
 
-#expression {
+#number {
     width: 100%;
     height: 100%;
     border: none;
     background-color: #F3F3F3;
     text-align: right;
-    font-size: 28pt;
+    font-size: 26pt;
     font-weight: bold;
     padding-right: 12px;
     padding-left: 12px;
 }
 
-#expression:focus {
+#number:focus {
     outline: none;
 }
 
 .output {
     width: 100%;
     height: 40%;
+}
+
+#expression {
+    width: 100%;
+    height: 100%;
+    border: none;
     padding-right: 12px;
     padding-left: 12px;
     text-align: right;
-    font-size: 18pt;
+    font-size: 16pt;
+    font-weight: bold;
     color: grey;
     opacity: 0.7;
+}
+
+#expression:focus {
+    outline: none;
 }
 
 .format {
@@ -136,7 +148,7 @@ sub {
     font-size: 12pt;
     display: flex;
     flex-direction: row;
-    background-color: #F4F4F4;
+    background-color: #F5F5F5;
     font-weight: 400;
     font-size: 11pt;
 }
