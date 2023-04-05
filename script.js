@@ -1,5 +1,3 @@
-const pi = Math.PI;
-const e = Math.E;
 
 let clickCount = 0;
 let ops2 = document.querySelector('.operations-item:first-child');
@@ -135,15 +133,15 @@ operations.addEventListener('mouseup', (event) => {
 // });
 
 operations.addEventListener("click", (event) => {
+    let num = input.value;
     let id;
+
     if(event.target.tagName == "svg") id = event.target.parentElement.id;
     else if(event.target.tagName == "path") id = event.target.parentElement.parentElement.id;
     else if(event.target.tagName == "polygon") id = event.target.parentElement.parentElement.id;
     else if(event.target.tagName == "sup") id = event.target.parentElement.id;
     else if(event.target.tagName == "sub") id = event.target.parentElement.id;
     else id = event.target.id;
-
-    let num = input.value;
 
     if(id=='clear') {
         exparr = [];
@@ -152,16 +150,22 @@ operations.addEventListener("click", (event) => {
         input.value = '0';
     }
 
+    else if(id=='clearEntry') {
+        input.value = 0;
+        document.getElementById('clearEntry').innerHTML = 'C';
+            document.getElementById('clearEntry').id = 'clear'
+    }
+
     else if(id=='backspace') {
         input.value = num.slice(0, exp.length-1);
     }
 
     else if(id == 'pi') {
-
+        input.value = Math.PI;
     }
 
     else if(id == 'e') {
-        
+        input.value = Math.E;
     }
 
     else if(id=='square') {
@@ -180,6 +184,7 @@ operations.addEventListener("click", (event) => {
             evalExparr.push(input.value);
         }
         expression.value = exparr.join(' ');
+        
     }    
 
     else if(id=='inverse') {
@@ -263,15 +268,19 @@ operations.addEventListener("click", (event) => {
         expression.value = exparr.join(' ');
     }    
 
-    else if(id=='leftParenthesis' && (evalExparr.length==0 || isNaN(evalExparr.at(-1)))) {
-        evalExp.push('(');
-        evalExparr.push('(');
-        expression.value = exparr.join(' ');
+    else if(id=='leftParenthesis') {
+        if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+            evalExp.push('(');
+            evalExparr.push('(');
+            expression.value = exparr.join(' ');
+        }
     }
-    else if(id=='rightParenthesis' && evalExparr.length!=0 && !isNaN(evalExparr.at(-1))) {
-        evalExp.push(')');
-        evalExparr.push(')');
-        expression.value = exparr.join(' ');
+    else if(id=='rightParenthesis') {
+        if (evalExparr.length!=0 && !isNaN(evalExparr.at(-1))) {
+            evalExp.push(')');
+            evalExparr.push(')');
+            expression.value = exparr.join(' ');
+        }
     }
 
     else if(id=='factorial') {
@@ -315,9 +324,6 @@ operations.addEventListener("click", (event) => {
             evalExp.push(num).push('^');
             evalExparr.push(num).push('**');
         }
-        // else if(evalExparr.at(-1)=='**') {
-        //     evalExp.push(num)
-        // }
         else {
             evalExp.push('^');
             evalExparr.push('**');
@@ -484,12 +490,12 @@ operations.addEventListener("click", (event) => {
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
             exparr.push(`e^(${num})`);
-            input.value = e ** (+num);
+            input.value = Math.exp(+num);
             evalExparr.push(input.value);
         }
         else {
             exparr.push(`e^(${exparr.pop()})`);
-            input.value = e ** (+num);
+            input.value = Math.exp(+num);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -497,27 +503,67 @@ operations.addEventListener("click", (event) => {
     }
 
     // else if(id=='yRoot') {
-    //     if(isNaN(num) || +num<0) {
-    //         alert(`${num} must be positive number`);
-    //     }
-    //     else if(exparr.at(-1) == 'yroot') {
-    //         exparr.push(num);
-
+    //     if(isNaN(num)) {
+    //         alert(`${num} is invalid`);
     //     }
     //     else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-    //         exparr.push(num).push('yroot');
-    //         // exparr.push(`cuberoot(${num})`);
-    //         // input.value = Math.pow(+num, 1/3);
-    //         // evalExparr.push(input.value);
+    //         evalExp.push(num).push('yroot');
+    //         evalExparr.push(num).push('**');
     //     }
     //     else {
-    //         exparr.push(`cuberoot(${exparr.pop()})`);
-    //         input.value = Math.pow(+num, 1/3);
-    //         evalExparr.pop();
-    //         evalExparr.push(input.value);
+    //         evalExp.push('yroot');
+    //         evalExparr.push('**');
     //     }
     //     expression.value = exparr.join(' ');
     // }
+
+    // else if(id=='logBaseY') {
+    //     if(isNaN(num)) {
+    //         alert(`${num} is invalid`);
+    //     }
+    //     else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+    //         evalExp.push(num).push('log base');
+    //         evalExparr.push(`Math.log(${num})`).push('/');
+    //     }
+    //     else {
+    //         evalExp.push('log base');
+    //         evalExparr.push('`Math.log(${num})`');
+    //     }
+    //     expression.value = exparr.join(' ');
+    // }
+
+    else if(id=='mod') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+            evalExp.push(num).push('=');
+            evalExparr.push(num);
+        }
+        else {
+            evalExp.push('=');
+        }
+        expression.value = exparr.join(' ');
+        input.value = eval(evalExparr.join(''));
+    }
+
+    else if(id=='sign') {
+        input.value = -1*num;
+    }
+
+    else {
+        if(+num==0) input.value = id
+        else input.value += id;
+
+        if(+input.value!=0) {
+            document.getElementById('clear').innerHTML = 'CE';
+            document.getElementById('clear').id = 'clearEntry';
+        }
+        else {
+            document.getElementById('clearEntry').innerHTML = 'C';
+            document.getElementById('clearEntry').id = 'clear';
+        }
+    }
 });
 
 function findNumberIndex(str) {
