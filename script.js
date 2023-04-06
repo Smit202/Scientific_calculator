@@ -8,12 +8,13 @@ let expression = document.getElementById('expression');
 // let exp = input.value;
 // console.log(expression);
 input.value = 0;
-expression.value = 258;
+// expression.value = 258;
 let exp = '';
 let exparr = [];
 let evalExp = '';
 let evalExparr = [];
 let history = [];
+let parenthesisStack = [];
 
 ops2.addEventListener('click', () => {
     if(clickCount%2==0) {
@@ -92,49 +93,9 @@ operations.addEventListener('mouseup', (event) => {
     else elem.style.backgroundColor = '#F8F8F8';
 });
 
-// operations.addEventListener("click", (event) => {
-//     let id;
-//     if(event.target.tagName == "svg") id = event.target.parentElement.id;
-//     else if(event.target.tagName == "path") id = event.target.parentElement.parentElement.id;
-//     else if(event.target.tagName == "polygon") id = event.target.parentElement.parentElement.id;
-//     else if(event.target.tagName == "sup") id = event.target.parentElement.id;
-//     else if(event.target.tagName == "sub") id = event.target.parentElement.id;
-//     else id = event.target.id;
-
-//     let exp = input.value;
-
-//     if(id=='clear') input.value = '';
-
-//     else if(id=='backspace') input.value = exp.slice(0, exp.length-1);
-    
-//     else if(id=='square') {
-//         if(isNaN(exp)) {
-//             let index = findNumberIndex(exp);
-//             if(index == exp.length) output.innerHTML = "Invalid Operation";
-//             else {
-//                 let num = +exp.slice(index);
-//                 input.value = exp.slice(0, index) + num*num;
-//             }
-//         }
-//         else input.value = +exp * +exp;
-//     }    
-
-//     else if(id=='inverse') {
-//         if(isNaN(exp)) {
-//             let index = findNumberIndex(exp);
-//             if(index == exp.length) output.innerHTML = "Invalid Operation";
-//             else {
-//                 let num = +exp.slice(index);
-//                 input.value = exp.slice(0, index) + 1/num;
-//             }
-//         }
-//         else input.value = 1/+exp;
-//     }
-// });
-
 operations.addEventListener("click", (event) => {
     let num = input.value;
-    let id;
+    let id, isCleared;
 
     if(event.target.tagName == "svg") id = event.target.parentElement.id;
     else if(event.target.tagName == "path") id = event.target.parentElement.parentElement.id;
@@ -142,6 +103,22 @@ operations.addEventListener("click", (event) => {
     else if(event.target.tagName == "sup") id = event.target.parentElement.id;
     else if(event.target.tagName == "sub") id = event.target.parentElement.id;
     else id = event.target.id;
+
+    if (exparr.at(-1)=='=') {
+        exparr = [];
+        evalExparr = [];
+        isCleared = true;
+    }
+    else    isCleared = false;
+
+    let interval = setInterval(() => {
+        if(expression.scrollLeft !== expression.scrollWidth) {
+            expression.scrollTo(expression.scrollLeft + 1, 0)
+        }
+        else clearInterval(interval)
+    }, 0);
+
+    
 
     if(id=='clear') {
         exparr = [];
@@ -157,7 +134,13 @@ operations.addEventListener("click", (event) => {
     }
 
     else if(id=='backspace') {
-        input.value = num.slice(0, exp.length-1);
+        if(num!=0 && num.length>1)  input.value = num.slice(0, num.length-1);
+        else if(num==0 && ['(', ')'].includes(exparr.at(-1))) {
+            exparr.pop();
+            evalExparr.pop();
+            expression.value = exparr.join(' ');
+        } 
+        else    input.value = 0;
     }
 
     else if(id == 'pi') {
@@ -168,33 +151,22 @@ operations.addEventListener("click", (event) => {
         input.value = Math.E;
     }
 
-    else if(id=='square') {
-        if(isNaN(num)) {
-            alert(`${num} is invalid`);
-        }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`(${num})^2`);
-            input.value = (+num) ** 2;
-            evalExparr.push(input.value);
-        }
-        else {
-            exparr.push(`(${exparr.pop()})^2`);
-            input.value = (+num) ** 2;
-            evalExparr.pop();
-            evalExparr.push(input.value);
-        }
+    else if(id=='exponential') {
+        if(isNaN(num))  alert(`${num} is invalid number`);
+        else    input.value = (+num).toExponential();
         expression.value = exparr.join(' ');
-        
-    }    
+    }
 
     else if(id=='inverse') {
         if(isNaN(num)) {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`1/(${num})`);
             input.value = 1/+num;
-            evalExparr.push(input.value);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`1/(${num})`);
         }
         else {
             exparr.push(`1/(${exparr.pop()})`);
@@ -210,9 +182,11 @@ operations.addEventListener("click", (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`abs(${num})`);
             input.value = Math.abs(+num);
-            evalExparr.push(input.value);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`abs(${num})`);
         }
         else {  // if(num==evalExparr.at(-1))
             exparr.push(`abs(${exparr.pop()})`);
@@ -229,68 +203,17 @@ operations.addEventListener("click", (event) => {
         expression.value = exparr.join(' ');
     }
 
-    else if(id=='exponential') {
-        if(isNaN(num))  alert(`${num} is invalid number`);
-        else    input.value = (+num).toExponential();
-        expression.value = exparr.join(' ');
-    }
-
-    else if(id=='mod') {
-        if(isNaN(num)) {
-            alert(`${num} is invalid`);
-        }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            evalExp.push(num).push('mod');
-            evalExparr.push(num).push('%');
-        }
-        else {
-            evalExp.push('mod');
-            evalExparr.push('%');
-        }
-        expression.value = exparr.join(' ');
-    }
-
-    else if(id=='squareRoot') {
-        if(isNaN(num) || +num<0) {
-            alert(`${num} must be positive number`);
-        }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`sqrt(${num})`);
-            input.value = Math.sqrt(+num);
-            evalExparr.push(input.value);
-        }
-        else {
-            exparr.push(`sqrt(${exparr.pop()})`);
-            input.value = Math.sqrt(+num);
-            evalExparr.pop();
-            evalExparr.push(input.value);
-        }
-        expression.value = exparr.join(' ');
-    }    
-
-    else if(id=='leftParenthesis') {
-        if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            evalExp.push('(');
-            evalExparr.push('(');
-            expression.value = exparr.join(' ');
-        }
-    }
-    else if(id=='rightParenthesis') {
-        if (evalExparr.length!=0 && !isNaN(evalExparr.at(-1))) {
-            evalExp.push(')');
-            evalExparr.push(')');
-            expression.value = exparr.join(' ');
-        }
-    }
-
     else if(id=='factorial') {
         if(isNaN(num)) {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`fact(${num})`);
+            
             input.value = factorial(num);
-            evalExparr.push(input.value);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`fact(${num})`);
         }
         else {
             exparr.push(`fact(${exparr.pop()})`);
@@ -301,77 +224,60 @@ operations.addEventListener("click", (event) => {
         expression.value = exparr.join(' ');
     }
 
-    else if(id=='division') {
+    else if(id=='square') {
         if(isNaN(num)) {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            evalExp.push(num).push('/');
-            evalExparr.push(num).push('/');
+            input.value = (+num) ** 2;
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`(${num})^2`);
         }
         else {
-            evalExp.push('/');
-            evalExparr.push('/');
+            exparr.push(`(${exparr.pop()})^2`);
+            input.value = (+num) ** 2;
+            evalExparr.pop();
+            evalExparr.push(input.value);
         }
         expression.value = exparr.join(' ');
-    }
+        
+    }  
+    
+    else if(id=='squareRoot') {
+        if(isNaN(num) || +num<0) {
+            alert(`${num} must be positive number`);
+        }
+        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+            input.value = Math.sqrt(+num);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`sqrt(${num})`);
+        }
+        else {
+            exparr.push(`sqrt(${exparr.pop()})`);
+            input.value = Math.sqrt(+num);
+            evalExparr.pop();
+            evalExparr.push(input.value);
+        }
+        expression.value = exparr.join(' ');
+    } 
 
     else if(id=='power') {
         if(isNaN(num)) {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            evalExp.push(num).push('^');
-            evalExparr.push(num).push('**');
-        }
-        else {
-            evalExp.push('^');
+            exparr.push(num)
+            exparr.push('^');
+            evalExparr.push(num)
             evalExparr.push('**');
         }
-        expression.value = exparr.join(' ');
-    }
-
-    else if(id=='multiplication') {
-        if(isNaN(num)) {
-            alert(`${num} is invalid`);
-        }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            evalExp.push(num).push('x');
-            evalExparr.push(num).push('*');
-        }
         else {
-            evalExp.push('x');
-            evalExparr.push('*');
-        }
-        expression.value = exparr.join(' ');
-    }
-
-    else if(id=='subtraction') {
-        if(isNaN(num)) {
-            alert(`${num} is invalid`);
-        }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            evalExp.push(num).push('-');
-            evalExparr.push(num).push('-');
-        }
-        else {
-            evalExp.push('-');
-            evalExparr.push('-');
-        }
-        expression.value = exparr.join(' ');
-    }
-
-    else if(id=='addition') {
-        if(isNaN(num)) {
-            alert(`${num} is invalid`);
-        }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            evalExp.push(num).push('+');
-            evalExparr.push(num).push('+');
-        }
-        else {
-            evalExp.push('+');
-            evalExparr.push('+');
+            exparr.push('^');
+            evalExparr.push('**');
         }
         expression.value = exparr.join(' ');
     }
@@ -380,50 +286,16 @@ operations.addEventListener("click", (event) => {
         if(isNaN(num)) {
             alert(`${num} is invalid`);
         }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`10^${num}`);
+        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {           
             input.value = 10 ** (+num);
-            evalExparr.push(input.value);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`10^${num}`);
         }
         else {
             exparr.push(`10^(${exparr.pop()})`);
             input.value = 10 ** (+num);
-            evalExparr.pop();
-            evalExparr.push(input.value);
-        }
-        expression.value = exparr.join(' ');
-    }
-
-    else if(id=='logBase10') {
-        if(isNaN(num)) {
-            alert(`${num} is invalid`);
-        }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`log(${num})`);
-            input.value = Math.log10(+num);
-            evalExparr.push(input.value);
-        }
-        else {
-            exparr.push(`log(${exparr.pop()})`);
-            input.value = Math.log10(+num);
-            evalExparr.pop();
-            evalExparr.push(input.value);
-        }
-        expression.value = exparr.join(' ');
-    }
-
-    else if(id=='ln') {
-        if(isNaN(num)) {
-            alert(`${num} is invalid`);
-        }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`ln(${num})`);
-            input.value = Math.log(+num);
-            evalExparr.push(input.value);
-        }
-        else {
-            exparr.push(`ln(${exparr.pop()})`);
-            input.value = Math.log(+num);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -435,9 +307,11 @@ operations.addEventListener("click", (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`(${num})^3`);
             input.value = (+num) ** 3;
-            evalExparr.push(input.value);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`(${num})^3`);
         }
         else {
             exparr.push(`(${exparr.pop()})^3`);
@@ -450,12 +324,14 @@ operations.addEventListener("click", (event) => {
 
     else if(id=='cubeRoot') {
         if(isNaN(num)) {
-            alert(`${num} must be is invalid`);
+            alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`cuberoot(${num})`);
             input.value = (+num) ** (1/3);
-            evalExparr.push(input.value);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`cuberoot(${num})`);
         }
         else {
             exparr.push(`cuberoot(${exparr.pop()})`);
@@ -471,9 +347,11 @@ operations.addEventListener("click", (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`2^(${num})`);
             input.value = 2 ** (+num);
-            evalExparr.push(input.value);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`2^(${num})`);
         }
         else {
             exparr.push(`2^(${exparr.pop()})`);
@@ -489,9 +367,11 @@ operations.addEventListener("click", (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            exparr.push(`e^(${num})`);
             input.value = Math.exp(+num);
-            evalExparr.push(input.value);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`e^(${num})`);
         }
         else {
             exparr.push(`e^(${exparr.pop()})`);
@@ -502,46 +382,226 @@ operations.addEventListener("click", (event) => {
         expression.value = exparr.join(' ');
     }
 
-    // else if(id=='yRoot') {
-    //     if(isNaN(num)) {
-    //         alert(`${num} is invalid`);
-    //     }
-    //     else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-    //         evalExp.push(num).push('yroot');
-    //         evalExparr.push(num).push('**');
-    //     }
-    //     else {
-    //         evalExp.push('yroot');
-    //         evalExparr.push('**');
-    //     }
-    //     expression.value = exparr.join(' ');
-    // }
+    else if(id=='logBase10') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+            input.value = Math.log10(+num);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`log(${num})`);
+        }
+        else {
+            exparr.push(`log(${exparr.pop()})`);
+            input.value = Math.log10(+num);
+            evalExparr.pop();
+            evalExparr.push(input.value);
+        }
+        expression.value = exparr.join(' ');
+    }
 
-    // else if(id=='logBaseY') {
-    //     if(isNaN(num)) {
-    //         alert(`${num} is invalid`);
-    //     }
-    //     else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-    //         evalExp.push(num).push('log base');
-    //         evalExparr.push(`Math.log(${num})`).push('/');
-    //     }
-    //     else {
-    //         evalExp.push('log base');
-    //         evalExparr.push('`Math.log(${num})`');
-    //     }
-    //     expression.value = exparr.join(' ');
-    // }
+    else if(id=='ln') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+            input.value = Math.log(+num);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(input.value);
+            exparr.push(`ln(${num})`);
+        }
+        else {
+            exparr.push(`ln(${exparr.pop()})`);
+            input.value = Math.log(+num);
+            evalExparr.pop();
+            evalExparr.push(input.value);
+        }
+        expression.value = exparr.join(' ');
+    }
+
+    else if(id=='yRoot') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+            exparr.push(num)
+            exparr.push('yroot');
+            evalExparr.push(`Math.pow(${+num},`);
+        }
+        else {
+            exparr.push('yroot');
+            evalExparr.push(`Math.pow(${+num},`);
+        }
+        expression.value = exparr.join(' ');
+    }
+
+    else if(id=='logBaseY') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+            exparr.push(num)
+            exparr.push('log base');
+            evalExparr.push(`logarithm(${+num},`)
+        }
+        else {
+            evalExp.push('log base');
+            evalExparr.push(`logarithm(${+num},`);
+        }
+        expression.value = exparr.join(' ');
+    }
+
+
+    else if(id=='leftParenthesis') {
+        if((evalExparr.length==0 || isNaN(evalExparr.at(-1))) && evalExparr.at(-1)!=')') {
+            exparr.push('(');
+            evalExparr.push('(');
+            parenthesisStack.push('(');
+        }
+        // bug in case of previous is yroot
+        else {
+            exparr.push('(');
+            evalExparr.push('*');
+            evalExparr.push('(');
+            parenthesisStack.push('(');
+        }
+        expression.value = exparr.join(' ');
+    }
+
+    else if(id=='rightParenthesis') {
+        if(parenthesisStack.length!=0) {
+            if ((evalExparr.length!=0 && !isNaN(evalExparr.at(-1))) || evalExparr.at(-1)==')') {
+                exparr.push(')');
+                evalExparr.push(')');
+                parenthesisStack.pop();
+            }
+            // bug in case of previous is yroot
+            else {
+                if(evalExparr.length!=0) {
+                    exparr.push(num);
+                    exparr.push(')');
+                    evalExparr.push(num);
+                    evalExparr.push(')');
+                    parenthesisStack.pop();
+                }
+            }
+        }
+        else alert('inavalid right parenthesis');
+        expression.value = exparr.join(' ');
+    }
 
     else if(id=='mod') {
         if(isNaN(num)) {
             alert(`${num} is invalid`);
         }
-        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            evalExp.push(num).push('=');
-            evalExparr.push(num);
+        else if((evalExparr.length==0 || isNaN(evalExparr.at(-1))) && exparr.at(-1)!=')') {
+            exparr.push(num)
+            exparr.push('mod');
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(num);
+            evalExparr.push('%');
         }
         else {
-            evalExp.push('=');
+            exparr.push('mod');
+            evalExparr.push('%');
+        }
+        expression.value = exparr.join(' ');
+    }   
+
+    else if(id=='division') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if((evalExparr.length==0 || isNaN(evalExparr.at(-1))) && exparr.at(-1)!=')') {
+            exparr.push(num)
+            exparr.push('/');
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(num);
+            evalExparr.push('/');
+        }
+        else {
+            exparr.push('/');
+            evalExparr.push('/');
+        }
+        expression.value = exparr.join(' ');
+    }
+
+    else if(id=='multiplication') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if((evalExparr.length==0 || isNaN(evalExparr.at(-1))) && exparr.at(-1)!=')') {
+            exparr.push(num)
+            exparr.push('x');
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(num);
+            evalExparr.push('*');
+        }
+        else {
+            exparr.push('x');
+            evalExparr.push('*');
+        }
+        expression.value = exparr.join(' ');
+    }
+
+    else if(id=='subtraction') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if((evalExparr.length==0 || isNaN(evalExparr.at(-1))) && exparr.at(-1)!=')') {
+            exparr.push(num)
+            exparr.push('-');
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(num);
+            evalExparr.push('-');
+        }
+        else {
+            exparr.push('-');
+            evalExparr.push('-');
+        }
+        expression.value = exparr.join(' ');
+    }
+
+    else if(id=='addition') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if((evalExparr.length==0 || isNaN(evalExparr.at(-1))) && exparr.at(-1)!=')') {
+            exparr.push(num)
+            exparr.push('+');
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(num);
+            evalExparr.push('+');
+        }
+        else {
+            exparr.push('+');
+            evalExparr.push('+');
+        }
+        expression.value = exparr.join(' ');
+    }
+
+    else if(id=='equal') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if((evalExparr.length==0 || isNaN(evalExparr.at(-1))) && !['(', ')'].includes(exparr.at(-1))) {
+            
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+num})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+num})`);
+            else evalExparr.push(num);
+            exparr.push(num)
+            exparr.push('=');
+        }
+        else {
+            exparr.push('=');
         }
         expression.value = exparr.join(' ');
         input.value = eval(evalExparr.join(''));
@@ -552,7 +612,9 @@ operations.addEventListener("click", (event) => {
     }
 
     else {
-        if(+num==0) input.value = id
+        if(num=='0' && id!='.') input.value = id;
+        // else if(isNaN(evalExparr.at(-1)) && evalExparr.at(-1)=='(') input.value = id;
+        else if(isNaN(evalExparr.at(-1)) && evalExparr.at(-2)==num || isCleared) input.value = id;
         else input.value += id;
 
         if(+input.value!=0) {
@@ -583,6 +645,9 @@ function factorial(num) {
     return (num==1 ? 1 : num*factorial(num-1));
 }
 
+function logarithm(n, base) {
+    return (Math.log(n) / Math.log(base));
+}
 
 
 
@@ -592,6 +657,7 @@ function factorial(num) {
 
 
 
+// ((()()))
 
 
 

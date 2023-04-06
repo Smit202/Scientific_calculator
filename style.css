@@ -150,11 +150,11 @@ sub {
     flex-direction: row;
     background-color: #F5F5F5;
     font-weight: 400;
-    font-size: 11pt;
+    font-size: 12pt;
 }
 
 .trigonometry, .func {
-    width: 28%;
+    width: 32%;
     height: 100%;
     padding: 5px 15px;
     cursor: pointer;
