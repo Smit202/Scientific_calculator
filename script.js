@@ -49,7 +49,7 @@ trigonometry.addEventListener('click', () => {
 
     if(trigFlag==0) {
         document.getElementById('trigonometryDropdown').style.display = 'block';
-        trigonometry.style.backgroundColor = '#D5D5D5';
+        trigonometry.style.backgroundColor = '#DDDDDD';
         trigFlag = 1;
     }
     else {
