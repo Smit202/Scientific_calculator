@@ -2,12 +2,16 @@
 let exparr = [];
 let evalExparr = [];
 let history = [];
+let memoryArray = []
 let parenthesisStack = [];
 let opsFlag = 0;
 let trigFlag = 0;
 let inverseTrigFlag = 0;
 let hypTrigFlag = 0;
 let funcFlag = 0;
+let angleFlag = 0;
+let feFlag = 0;
+let memoryFlag = 0;
 
 const ops2 = document.querySelector('.operations-item:first-child');
 const operations = document.getElementsByClassName('operations')[0];
@@ -19,7 +23,54 @@ const inverseTrig = document.getElementById('inverseTrig');
 const hyperbolicTrig = document.getElementById('hyperbolicTrig');
 const trigFunctions = document.getElementById('trigFunctions');
 const functionOperations = document.getElementById('functionOperations');
+const angle = document.getElementById('angle');
+const format = document.getElementsByClassName('format')[0];
+const memory = document.getElementsByClassName('memory')[0];
+const FE = document.getElementById('FE')
+
 input.value = 0;
+
+operations.addEventListener('mousedown', mouseDownAction);
+operations.addEventListener('mouseup', mouseUpAction);
+
+trigFunctions.addEventListener('mousedown', mouseDownAction);
+trigFunctions.addEventListener('mouseup', mouseUpAction);
+
+functionOperations.addEventListener('mousedown', mouseDownAction);
+functionOperations.addEventListener('mouseup', mouseUpAction);
+
+format.addEventListener('mousedown', (event) => event.target.style.backgroundColor = '#DDDDDD');
+format.addEventListener('mouseup', (event) => event.target.style.backgroundColor = '#F3F3F3');
+
+memory.addEventListener('mousedown', (event) => event.target.style.backgroundColor = '#DDDDDD');
+memory.addEventListener('mouseup', (event) => event.target.style.backgroundColor = '#F3F3F3');
+
+angle.addEventListener('click', () => {
+    // angle.style.backgroundColor = '#DDDDDD';
+    if(angleFlag==0) {
+        angle.innerHTML = 'RAD';
+        angleFlag = 1;
+    }
+    else if(angleFlag==1) {
+        angle.innerHTML = 'GRAD';
+        angleFlag = 2;
+    }
+    else {
+        angle.innerHTML = 'DEG';
+        angleFlag = 0;
+    }
+});
+
+FE.addEventListener('click', () => {
+    if(feFlag==0) {
+        FE.style.borderBottom = '3px solid #6a9dc8';
+        feFlag = 1;
+    }
+    else {
+        FE.style.borderBottom = 'none';
+        feFlag = 0;
+    }
+});
 
 func.addEventListener('click', () => {
     if(trigFlag==1) {
@@ -204,16 +255,15 @@ ops2.addEventListener('click', () => {
     }
 });
 
-operations.addEventListener('mousedown', mouseDownAction);
-operations.addEventListener('mouseup', mouseUpAction);
-trigFunctions.addEventListener('mousedown', mouseDownAction);
-trigFunctions.addEventListener('mouseup', mouseUpAction);
-functionOperations.addEventListener('mousedown', mouseDownAction);
-functionOperations.addEventListener('mouseup', mouseUpAction);
-
 operations.addEventListener("click", (event) => {
-    let num = input.value;
-    let id, isCleared;
+    
+    let num, id, isCleared;
+    // if(feFlag) {
+    //     num = (+input.value).toExponential();
+    //     // input.value = num;
+    // }
+    // else num = input.value;
+    num = input.value
 
     if(event.target.tagName == "svg") id = event.target.parentElement.id;
     else if(event.target.tagName == "path") id = event.target.parentElement.parentElement.id;
@@ -746,7 +796,7 @@ operations.addEventListener("click", (event) => {
 
 trigFunctions.addEventListener('click', (event) => {
     let num = input.value;
-    let id, isCleared;
+    let id, isCleared, radAngle;
 
     if(event.target.tagName == "svg") id = event.target.parentElement.id;
     else if(event.target.tagName == "path") id = event.target.parentElement.parentElement.id;
@@ -769,12 +819,16 @@ trigFunctions.addEventListener('click', (event) => {
         else clearInterval(interval)
     }, 0);
 
+    if(angleFlag==0) radAngle = degToRadian(+num);
+    else if(angleFlag==1) radAngle = +num;
+    else radAngle = gradToRadian(+num);
+
     if(id=='sin') {
         if(isNaN(num)) {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.sin(+num);
+            input.value = Math.sin(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -782,7 +836,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`sin(${exparr.pop()})`);
-            input.value = Math.sin(+num);
+            input.value = Math.sin(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -794,7 +848,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.cos(+num);
+            input.value = Math.cos(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -802,7 +856,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`cos(${exparr.pop()})`);
-            input.value = Math.cos(+num);
+            input.value = Math.cos(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -814,7 +868,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.tan(+num);
+            input.value = Math.tan(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -822,7 +876,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`tan(${exparr.pop()})`);
-            input.value = Math.tan(+num);
+            input.value = Math.tan(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -834,7 +888,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = 1/Math.cos(+num);
+            input.value = 1/Math.cos(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -842,7 +896,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`sec(${exparr.pop()})`);
-            input.value = 1/Math.cos(+num);
+            input.value = 1/Math.cos(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -854,7 +908,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = 1/Math.sin(+num);
+            input.value = 1/Math.sin(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -862,7 +916,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`csc(${exparr.pop()})`);
-            input.value = 1/Math.sin(+num);
+            input.value = 1/Math.sin(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -874,7 +928,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = 1/Math.tan(+num);
+            input.value = 1/Math.tan(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -882,7 +936,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`cot(${exparr.pop()})`);
-            input.value = 1/Math.tan(+num);
+            input.value = 1/Math.tan(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -894,7 +948,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.asin(+num);
+            input.value = Math.asin(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -902,7 +956,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arcsin(${exparr.pop()})`);
-            input.value = Math.asin(+num);
+            input.value = Math.asin(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -914,7 +968,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.acos(+num);
+            input.value = Math.acos(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -922,7 +976,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arccos(${exparr.pop()})`);
-            input.value = Math.acos(+num);
+            input.value = Math.acos(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -934,7 +988,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.atan(+num);
+            input.value = Math.atan(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -942,7 +996,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arctan(${exparr.pop()})`);
-            input.value = Math.atan(+num);
+            input.value = Math.atan(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -954,7 +1008,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.acos(1/+num);
+            input.value = Math.acos(1/radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -962,7 +1016,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arcsec(${exparr.pop()})`);
-            input.value = Math.acos(1/+num);
+            input.value = Math.acos(1/radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -974,7 +1028,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.asin(1/+num);
+            input.value = Math.asin(1/radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -982,7 +1036,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arccsc(${exparr.pop()})`);
-            input.value = Math.asin(1/+num);
+            input.value = Math.asin(1/radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -994,7 +1048,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.atan(1/+num);
+            input.value = Math.atan(1/radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1002,7 +1056,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arccot(${exparr.pop()})`);
-            input.value = Math.atan(1/+num);
+            input.value = Math.atan(1/radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1014,7 +1068,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.sinh(+num);
+            input.value = Math.sinh(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1022,7 +1076,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`sinh(${exparr.pop()})`);
-            input.value = Math.sinh(+num);
+            input.value = Math.sinh(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1034,7 +1088,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.cosh(+num);
+            input.value = Math.cosh(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1042,7 +1096,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`cosh(${exparr.pop()})`);
-            input.value = Math.cosh(+num);
+            input.value = Math.cosh(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1054,7 +1108,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.tanh(+num);
+            input.value = Math.tanh(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1062,7 +1116,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`tanh(${exparr.pop()})`);
-            input.value = Math.tanh(+num);
+            input.value = Math.tanh(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1074,7 +1128,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = 1/Math.cosh(+num);
+            input.value = 1/Math.cosh(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1082,7 +1136,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`sech(${exparr.pop()})`);
-            input.value = 1/Math.cosh(+num);
+            input.value = 1/Math.cosh(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1094,7 +1148,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = 1/Math.sinh(+num);
+            input.value = 1/Math.sinh(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1102,7 +1156,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`csch(${exparr.pop()})`);
-            input.value = 1/Math.sinh(+num);
+            input.value = 1/Math.sinh(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1114,7 +1168,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = 1/Math.tanh(+num);
+            input.value = 1/Math.tanh(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1122,7 +1176,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`coth(${exparr.pop()})`);
-            input.value = 1/Math.tanh(+num);
+            input.value = 1/Math.tanh(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1134,7 +1188,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.asinh(+num);
+            input.value = Math.asinh(+radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1142,7 +1196,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arcsinh(${exparr.pop()})`);
-            input.value = Math.asinh(+num);
+            input.value = Math.asinh(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1154,7 +1208,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.acosh(+num);
+            input.value = Math.acosh(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1162,7 +1216,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arccosh(${exparr.pop()})`);
-            input.value = Math.acosh(+num);
+            input.value = Math.acosh(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1174,7 +1228,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.atanh(+num);
+            input.value = Math.atanh(radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1182,7 +1236,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arctanh(${exparr.pop()})`);
-            input.value = Math.atanh(+num);
+            input.value = Math.atanh(radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1194,7 +1248,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.acosh(1/+num);
+            input.value = Math.acosh(1/radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1202,7 +1256,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arcsech(${exparr.pop()})`);
-            input.value = Math.acosh(1/+num);
+            input.value = Math.acosh(1/radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1214,7 +1268,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.asinh(1/+num);
+            input.value = Math.asinh(1/radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1234,7 +1288,7 @@ trigFunctions.addEventListener('click', (event) => {
             alert(`${num} is invalid`);
         }
         else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
-            input.value = Math.atanh(1/+num);
+            input.value = Math.atanh(1/radAngle);
             if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
             else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
             else evalExparr.push(input.value);
@@ -1242,7 +1296,7 @@ trigFunctions.addEventListener('click', (event) => {
         }
         else {
             exparr.push(`arccoth(${exparr.pop()})`);
-            input.value = Math.atanh(1/+num);
+            input.value = Math.atanh(1/radAngle);
             evalExparr.pop();
             evalExparr.push(input.value);
         }
@@ -1251,7 +1305,7 @@ trigFunctions.addEventListener('click', (event) => {
     else {}
 });
 
-functionOperations.addEventListener('click', () => {
+functionOperations.addEventListener('click', (event) => {
     let num = input.value;
     let id, isCleared;
 
@@ -1339,7 +1393,95 @@ functionOperations.addEventListener('click', () => {
     else if(id=='rand') {
         input.value = Math.random();
     }
+
+    else if(id=='dms') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+            input.value = dms(+num);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
+            else evalExparr.push(input.value);
+            exparr.push(`dms(${num})`);
+        }
+        else {  
+            exparr.push(`dms(${exparr.pop()})`);
+            input.value = dms(+num);
+            evalExparr.pop();
+            evalExparr.push(input.value);
+        }
+        expression.value = exparr.join(' ');
+    }
+
+    else if(id=='deg') {
+        if(isNaN(num)) {
+            alert(`${num} is invalid`);
+        }
+        else if(evalExparr.length==0 || isNaN(evalExparr.at(-1))) {
+            input.value = deg(+num);
+            if(exparr.at(-1)=='yroot') evalExparr.push(`1/${+input.value})`);
+            else if(exparr.at(-1)=='log base') evalExparr.push(`${+input.value})`);
+            else evalExparr.push(input.value);
+            exparr.push(`deg(${num})`);
+        }
+        else {  
+            exparr.push(`deg(${exparr.pop()})`);
+            input.value = deg(+num);
+            evalExparr.pop();
+            evalExparr.push(input.value);
+        }
+        expression.value = exparr.join(' ');
+    }
 });
+
+memory.addEventListener('click', (event) => {
+    let num = input.value;
+    let id = event.target.id;
+    let memoryLength = memoryArray.length;
+    // if(event.target.tagName == "svg") id = event.target.parentElement.id;
+    // else if(event.target.tagName == "path") id = event.target.parentElement.parentElement.id;
+    // else if(event.target.tagName == "polygon") id = event.target.parentElement.parentElement.id;
+    // else if(event.target.tagName == "sup") id = event.target.parentElement.id;
+    // else if(event.target.tagName == "sub") id = event.target.parentElement.id;
+    // else id = event.target.id;
+
+    // let interval = setInterval(() => {
+    //     if(expression.scrollLeft !== expression.scrollWidth) {
+    //         expression.scrollTo(expression.scrollLeft + 1, 0)
+    //     }
+    //     else clearInterval(interval)
+    // }, 0);
+
+    if(id=='MC' && memoryFlag==1) {
+        memoryArray = [];
+        memoryFlag = 0;
+        document.getElementById('MC').style.color = 'rgba(128, 128, 128, 0.6)';
+        document.getElementById('MR').style.color = 'rgba(128, 128, 128, 0.6)';
+    }
+    else if(id=='MR' && memoryFlag==1) input.value = memoryArray[memoryLength-1];
+    else if(id=='M+') {
+        if(memoryLength==0) memoryArray.push(+num);
+        else memoryArray[memoryLength-1] += +num;
+        memoryFlag = 1;
+        document.getElementById('MC').style.color = 'black';
+        document.getElementById('MR').style.color = 'black';
+    }
+    else if(id=='M-') {
+        if(memoryLength==0) memoryArray.push(0 - +num);
+        else memoryArray[memoryLength-1] -= +num;
+        memoryFlag = 1;
+        document.getElementById('MC').style.color = 'black';
+        document.getElementById('MR').style.color = 'black';
+    }
+    else if(id=='MS') {
+        memoryArray.push(+num);
+        memoryFlag = 1;
+        document.getElementById('MC').style.color = 'black';
+        document.getElementById('MR').style.color = 'black';
+    }
+    else {}
+})
 
 function mouseDownAction(event) {
     let id;
@@ -1363,7 +1505,7 @@ function mouseUpAction(event) {
     else id = event.target.id;
 
     let elem = document.getElementById(id);
-    if(elem.className === 'operations-item-number') elem.style.backgroundColor = '#FDFDFD';
+    if(['operations-item-number', 'trigFunc', 'normalFunc', 'memory'].includes(elem.className)) elem.style.backgroundColor = '#FDFDFD';
     else elem.style.backgroundColor = '#F8F8F8';
 }
 
@@ -1373,6 +1515,54 @@ function factorial(num) {
 
 function logarithm(n, base) {
     return (Math.log(n) / Math.log(base));
+}
+
+function dms(num) {
+    if(Number.isInteger(num)) return num;
+    let options = {
+        minimumIntegerDigits: 2, 
+        useGrouping: false,
+    };
+
+    let sign;
+    if(num<0) sign = '-';
+    else sign = '';
+
+    let n = Math.abs(num);
+    let deg = Math.floor(n);
+    let temp = (n-deg)*60;
+    let min = Math.floor(temp).toLocaleString('en-US', options);
+
+    if(Number.isInteger(+temp.toFixed(4)))  return ( sign + deg + '.' + min);
+    temp = (temp - +min)*60;
+    let sec = Math.floor(temp).toLocaleString('en-US',options);
+    if(Number.isInteger(+temp.toFixed(4)))  return (sign + deg + '.' + min + sec);
+    
+    temp = temp - +sec;
+    let numStr = num.toString().split('.')[1];
+    let index = temp.toString().indexOf('000', 2);
+    if(index<=numStr.length && index>0) return (sign + deg + '.' + min + sec + temp.toFixed(index-2).toString().split('.')[1]);
+    else if(temp.toString().length <= numStr.length) return (sign + deg + '.' + min + sec + temp);
+    else return (sign + deg + '.' + min + sec + temp.toFixed(numStr.length-2).toString().split('.')[1]);
+}
+
+function deg(num) {
+    let degree = Math.floor(num);
+    let temp = (num - degree)*100;
+    let min = Math.floor(temp);
+    degree += min/60;
+    temp = (temp - min)*100;
+    sec = temp;
+    degree += sec/3600;
+    return degree;
+}
+
+function degToRadian(num) {
+    return num * Math.PI/180;
+}
+
+function gradToRadian(num) {
+    return num * Math.PI/200;
 }
 
 function historyObject(expression, result) {

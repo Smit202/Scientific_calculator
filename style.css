@@ -35,22 +35,29 @@ sub {
 .heading {
     width: 100%;
     height: 8%;
-    /* background-color: aliceblue; */
-    padding: 12px;
-    /* padding-bottom: 40px; */
+    display: flex;
     border-bottom: 2px solid rgba(128, 128, 128, 0.5);
 }
 
-.heading h2 {
-    display: inline;
-    opacity: 0.8;
+#headingName {
+    width: 90%;
+    height: 100%;
+    padding-left: 12px;
+    display: flex;
+    align-items: center;
 }
 
 .heading i {
-    float: right;
-    /* color: #717171; */
     color: grey;
-    margin-top: 12px;
+}
+
+#history {
+    width: 12%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
 }
 
 .calculator {
@@ -112,53 +119,66 @@ sub {
 
 .format {
     width: 100%;
-    height: 7.5%;
+    height: 7%;
     /* background-color: red; */
     display: flex;
     flex-direction: row;
     font-size: 12pt;
 }
 
-.degree, .FE {
-    width: 18%;
+#angle, #FE {
+    width: 17%;
     height: 100%;
     padding: 2px 20px;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .memory {
     width: 100%;
-    height: 7.5%;
+    height: 7%;
     /* background-color: red; */
     display: flex;
     flex-direction: row;
     font-size: 12pt;
 }
 
-.MC, .MR, .M\+, .M-, .MS {
+.memory div {
     width: 20%;
     height: 100%;
     padding: 2px 25px;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#MC, #MR {
+    color: rgba(128, 128, 128, 0.6);
 }
 
 .functions {
     width: 100%;
-    height: 7%;
+    height: 8%;
     font-size: 12pt;
     display: flex;
     flex-direction: row;
-    background-color: #f6f6f6;
-    font-weight: 400;
+    background-color: #f7f7f7;
+    font-weight: 500;
     font-size: 12pt;
     padding-left: 6px;
 }
 
 #trigonometry, #func {
-    width: 35%;
+    width: 32%;
     height: 100%;
-    padding: 10px 15px;
+    /* padding: 10px 15px; */
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #trigonometryDropdown {
@@ -166,10 +186,10 @@ sub {
     height: 19%;
     background-color: #F8F8F8;
     position: relative;
-    top: -55%;  /*330px*/
+    top: -54%;  /*330px*/
     margin-left: 6px;
     display: none;
-    box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.1);
 }
 
 #trigonometryOperations {
@@ -225,11 +245,11 @@ sub {
     height: 19%;
     background-color: #F8F8F8;
     position: relative;
-    top: -55%;  /*330px*/
+    top: -54%;  /*330px*/
     left: 22%;
     margin-left: 6px;
     display: none;
-    box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.1);
 }
 
 #functionOperations {
